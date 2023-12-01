@@ -35,7 +35,7 @@ int process_line(size_t length, char * text)
                 leftFound = true;
             }
             // always update right
-            right = text[i] - '0';
+            right = left;
         }
         else //It cant be a number, so check if it is a string number
         {
@@ -45,7 +45,7 @@ int process_line(size_t length, char * text)
             int remaining = length - i;
             if(remaining >= (strlen(stringNumbers[1])-1)) // -1 as we dont need to check the null
             {
-                // Starting at j = 1 as challenge didnt state zero
+                // Starting at j = 1 as the challenge didnt state zero
                 for (size_t j = 1; j < stringNumbersLength; j++)
                 {
                     size_t currentLength = strlen(stringNumbers[j]) - 1; 
