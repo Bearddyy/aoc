@@ -18,7 +18,9 @@ static const size_t stringNumbersLength = 10;
 // accepts a line of text, returns the first and last digits combined
 int process_line(size_t length, char * text)
 {
-    int left = length;
+    int leftInd = length;
+    int left = 0;
+    int rightInd = 0;
     int right = 0;
     char character;
     for(size_t i = 0; i < length; i++)
@@ -26,13 +28,15 @@ int process_line(size_t length, char * text)
         size_t found = 0;
         if(isdigit(text[i]))
         {
-            if(i < left)
+            if(i < leftInd)
             {
-                left = i;
+                leftInd = i;
+                left = text[i] - '0';
             }
-            if(i > right)
-            {
-                right = i;
+            if(i > rightInd)
+            {  
+                rightInd = i;
+                right = text[i] - '0';
             }
         }
         else
@@ -44,13 +48,15 @@ int process_line(size_t length, char * text)
                 {
                     if(0 == strncmp(&text[i],stringNumbers[j],currentLength))
                     {
-                        if(i < left)
+                        if(i < leftInd)
                         {
-                            left = i;
+                            leftInd = i;
+                            left = j;
                         }
-                        if(i > right)
-                        {
-                            right = i;
+                        if(i > rightInd)
+                        {  
+                            rightInd = i;
+                            right = j;
                         }
                     }
                 }
@@ -58,43 +64,8 @@ int process_line(size_t length, char * text)
         }
         
     }
-    int result = ((text[left] - '0') * 10) + (text[right] - '0');
+    int result = (left * 10) + right;
     return result;
-}
-
-
-bool test_process_line(char * nullTermString, int expected)
-{
-    size_t length = strlen(nullTermString);
-    int result = process_line(length, nullTermString);
-    if(result != expected)
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-}
-
-void test_1(void)
-{
-    char testString1[] = "1abc2";
-    bool result = test_process_line(testString1, 12);
-    printf("Test 1:%d\r\n", result);
-
-    char testString2[] = "pqr3stu8vwx";
-    result = test_process_line(testString2, 38);
-    printf("Test 2:%d\r\n", result);
-
-
-    char testString3[] = "a1b2c3d4e5f";
-    result = test_process_line(testString3, 15);
-    printf("Test 3:%d\r\n", result);
-
-    char testString4[] = "treb7uchet";
-    result = test_process_line(testString4, 77);
-    printf("Test 4:%d\r\n", result);
 }
 
 int processFile(char * path)
@@ -117,10 +88,46 @@ int processFile(char * path)
     {
         // handle each line
         size_t length = strlen(line);
-        result += process_line(length,line);
+        int temp = process_line(length,line);
+        result += temp;
     }
     fclose(filePointer);
     return result;
+}
+
+
+bool test_process_line(char * nullTermString, int expected)
+{
+    size_t length = strlen(nullTermString);
+    int result = process_line(length, nullTermString);
+    if(result != expected)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+void test_1(void)
+{
+    char testString1[] = "1abc2";
+    bool result = test_process_line(testString1, 12);
+    printf("Test 1.1:%d\r\n", result);
+
+    char testString2[] = "pqr3stu8vwx";
+    result = test_process_line(testString2, 38);
+    printf("Test 1.2:%d\r\n", result);
+
+
+    char testString3[] = "a1b2c3d4e5f";
+    result = test_process_line(testString3, 15);
+    printf("Test 1.3:%d\r\n", result);
+
+    char testString4[] = "treb7uchet";
+    result = test_process_line(testString4, 77);
+    printf("Test 1.4:%d\r\n", result);
 }
 
 void test_2(void)
@@ -144,10 +151,25 @@ void test_challenge_file(void)
     printf("Got Result:%d\r\n", result);
 }
 
+void test_3(void)
+{
+    int result = processFile("seccondHalfFile.txt");
+    if(result != 281)
+    {
+        printf("Failed test 3 with result:%d\r\n", result);
+        exit(1);
+    }
+    else
+    {
+        printf("Passed test 3\r\n");
+    }
+}
+
 int main(void)
 {
     test_1();
     test_2();
+    test_3();
 
     // Test with the challenge file
     test_challenge_file();
