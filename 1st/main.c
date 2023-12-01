@@ -110,9 +110,19 @@ void test_2(void)
     }
 }
 
+void test_challenge_file(void)
+{
+    int result = processFile("challengeFile.txt");
+
+    printf("Got Result:%d\r\n", result);
+}
+
 int main(void)
 {
     test_1();
     test_2();
+
+    // Test with the challenge file
+    test_challenge_file();
     return 0;
 }
