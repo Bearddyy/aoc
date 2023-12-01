@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 //1abc2
 //pqr3stu8vwx
@@ -69,8 +70,49 @@ void test_1(void)
     printf("Test 4:%d\r\n", result);
 }
 
+int processFile(char * path)
+{
+    FILE *filePointer = fopen(path, "r");
+    if (filePointer == NULL)
+    {
+        printf("Error reading file\r\n");
+        exit(1);
+    }
+
+    size_t maxLineLength = 512;
+    char line[maxLineLength];
+
+    //Overall result
+    int result = 0;
+
+    // get each line
+    while (fgets(line, maxLineLength, filePointer))
+    {
+        // handle each line
+        size_t length = strlen(line);
+        result += process_line(length,line);
+    }
+    fclose(filePointer);
+    return result;
+}
+
+void test_2(void)
+{
+    int result = processFile("testFile1.txt");
+    if(result != 142)
+    {
+        printf("Failed test 2 with result:%d\r\n", result);
+        exit(1);
+    }
+    else
+    {
+        printf("Passed test 2\r\n");
+    }
+}
+
 int main(void)
 {
     test_1();
+    test_2();
     return 0;
 }
