@@ -23,38 +23,37 @@ int process_line(size_t length, char * text)
     int rightInd = 0;
     int right = 0;
     char character;
+    bool leftFound = false;
+
     for(size_t i = 0; i < length; i++)
     {
-        if(isdigit(text[i]))
+        if((i <= leftInd ) && !leftFound) // Only look for left if we havent found it yet
         {
-            if(i <= leftInd)
+            if(isdigit(text[i]))
             {
                 leftInd = i;
                 left = text[i] - '0';
-            }
-            if(i >= rightInd)
-            {  
+                leftFound = true;
+
+                //We have found left, so we can set right
                 rightInd = i;
                 right = text[i] - '0';
             }
-        }
-        else
-        {
-            // Starting at j = 1 as challenge didnt state zero
-            for (size_t j = 1; j < stringNumbersLength; j++)
+            else //It cant be a number, so check if it is a string number
             {
-                size_t currentLength = strlen(stringNumbers[j]) - 1; // ignore null as that doesnt need to match
-                if(currentLength <= (length - i)) // Protect against reading over edge
+                // Starting at j = 1 as challenge didnt state zero
+                for (size_t j = 1; j < stringNumbersLength; j++)
                 {
-                    if(0 == strncmp(&text[i],stringNumbers[j],currentLength))
+                    size_t currentLength = strlen(stringNumbers[j]) - 1; // ignore null as that doesnt need to match
+                    if(currentLength <= (length - i)) // Protect against reading over end
                     {
-                        if(i <= leftInd)
+                        if(0 == strncmp(&text[i],stringNumbers[j],currentLength))
                         {
                             leftInd = i;
                             left = j;
-                        }
-                        if(i >= rightInd)
-                        {  
+                            leftFound = true;
+
+                            //We have found left, so we can set right
                             rightInd = i;
                             right = j;
                         }
@@ -62,7 +61,31 @@ int process_line(size_t length, char * text)
                 }
             }
         }
-        
+        if((i > rightInd) && leftFound) // Only look for right if we have found left
+        {
+            if(isdigit(text[i]))
+            {
+                rightInd = i;
+                right = text[i] - '0';
+            }
+            else
+            {
+                // Starting at j = 1 as challenge didnt state zero
+                for (size_t j = 1; j < stringNumbersLength; j++)
+                {
+                    size_t currentLength = strlen(stringNumbers[j]) - 1; // ignore null as that doesnt need to match
+                    if(currentLength <= (length - i)) // Protect against reading over end
+                    {
+                        if(0 == strncmp(&text[i],stringNumbers[j],currentLength))
+                        {
+                            rightInd = i;
+                            right = j;
+                        }
+                    }
+                }
+            }
+            
+        }        
         //printf("l:%d:%d,  r:%d:%d\r\n", leftInd, left, rightInd, right);
     }
     int result = (left * 10) + right;
@@ -149,8 +172,16 @@ void test_2(void)
 void test_challenge_file(void)
 {
     int result = processFile("challengeFile.txt");
-
-    printf("Got Result:%d\r\n", result);
+    int expected = 54094;
+    if(result != expected)
+    {
+        printf("Failed test with example file, got:%d != %d\r\n", result, expected);
+        exit(1);
+    }
+    else
+    {
+        printf("Passed with challenge file\r\n");
+    }
 }
 
 void test_3(void)
