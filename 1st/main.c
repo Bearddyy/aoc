@@ -25,15 +25,14 @@ int process_line(size_t length, char * text)
     char character;
     for(size_t i = 0; i < length; i++)
     {
-        size_t found = 0;
         if(isdigit(text[i]))
         {
-            if(i < leftInd)
+            if(i <= leftInd)
             {
                 leftInd = i;
                 left = text[i] - '0';
             }
-            if(i > rightInd)
+            if(i >= rightInd)
             {  
                 rightInd = i;
                 right = text[i] - '0';
@@ -41,19 +40,20 @@ int process_line(size_t length, char * text)
         }
         else
         {
-            for (size_t j = 0; j < stringNumbersLength; j++)
+            // Starting at j = 1 as challenge didnt state zero
+            for (size_t j = 1; j < stringNumbersLength; j++)
             {
-                size_t currentLength = strlen(stringNumbers[j]);
-                if(currentLength <= length)
+                size_t currentLength = strlen(stringNumbers[j]) - 1; // ignore null as that doesnt need to match
+                if(currentLength <= (length - i)) // Protect against reading over edge
                 {
                     if(0 == strncmp(&text[i],stringNumbers[j],currentLength))
                     {
-                        if(i < leftInd)
+                        if(i <= leftInd)
                         {
                             leftInd = i;
                             left = j;
                         }
-                        if(i > rightInd)
+                        if(i >= rightInd)
                         {  
                             rightInd = i;
                             right = j;
@@ -63,6 +63,7 @@ int process_line(size_t length, char * text)
             }
         }
         
+        //printf("l:%d:%d,  r:%d:%d\r\n", leftInd, left, rightInd, right);
     }
     int result = (left * 10) + right;
     return result;
@@ -90,6 +91,7 @@ int processFile(char * path)
         size_t length = strlen(line);
         int temp = process_line(length,line);
         result += temp;
+        //printf("result:%d\r\n", temp);
     }
     fclose(filePointer);
     return result;
@@ -165,11 +167,27 @@ void test_3(void)
     }
 }
 
+void test_4(void)
+{
+    char testString[] = "eighthree";
+    int result = test_process_line(testString, 83);
+    printf("Test 4.1:%d\r\n", result);
+    
+    char testString2[] = "sevenine";
+    result = test_process_line(testString2, 79);
+    printf("Test 4.2:%d\r\n", result);
+
+    char testString3[] = "9g";
+    result = test_process_line(testString3, 99);
+    printf("Test 4.3:%d\r\n", result);
+}
+
 int main(void)
 {
     test_1();
     test_2();
     test_3();
+    test_4();
 
     // Test with the challenge file
     test_challenge_file();
