@@ -10,6 +10,11 @@
 //a1b2c3d4e5f
 //treb7uchet
 
+static const char* stringNumbers[] = {
+    "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"
+    };
+static const size_t stringNumbersLength = 10;
+
 // accepts a line of text, returns the first and last digits combined
 int process_line(size_t length, char * text)
 {
@@ -18,8 +23,8 @@ int process_line(size_t length, char * text)
     char character;
     for(size_t i = 0; i < length; i++)
     {
-        character = text[i];
-        if(isdigit(character))
+        size_t found = 0;
+        if(isdigit(text[i]))
         {
             if(i < left)
             {
@@ -30,6 +35,28 @@ int process_line(size_t length, char * text)
                 right = i;
             }
         }
+        else
+        {
+            for (size_t j = 0; j < stringNumbersLength; j++)
+            {
+                size_t currentLength = strlen(stringNumbers[j]);
+                if(currentLength <= length)
+                {
+                    if(0 == strncmp(&text[i],stringNumbers[j],currentLength))
+                    {
+                        if(i < left)
+                        {
+                            left = i;
+                        }
+                        if(i > right)
+                        {
+                            right = i;
+                        }
+                    }
+                }
+            }
+        }
+        
     }
     int result = ((text[left] - '0') * 10) + (text[right] - '0');
     return result;
