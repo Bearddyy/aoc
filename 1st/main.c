@@ -18,6 +18,8 @@ static const size_t stringNumbersLength = 10;
 // accepts a line of text, returns the first and last digits combined
 int process_line(size_t length, char * text)
 {
+    // Unclear if we need to handle if there are no numbers in the line
+    // So will just return 0 if there are no numbers
     int left = 0;
     int right = 0;
     bool leftFound = false;
@@ -38,14 +40,15 @@ int process_line(size_t length, char * text)
         else //It cant be a number, so check if it is a string number
         {
             // check if there is at least the minimum length left
-            // This avoids checking the last few characters for a number
+            // This avoids checking the last few characters, will be slightly slower on very long lines
+            // but will be faster on short lines
             int remaining = length - i;
-            if(remaining >= strlen(stringNumbers[1]))
+            if(remaining >= (strlen(stringNumbers[1])-1)) // -1 as we dont need to check the null
             {
                 // Starting at j = 1 as challenge didnt state zero
                 for (size_t j = 1; j < stringNumbersLength; j++)
                 {
-                    size_t currentLength = strlen(stringNumbers[j]) - 1; // ignore null as that doesnt need to match
+                    size_t currentLength = strlen(stringNumbers[j]) - 1; 
                     if(currentLength <= remaining) // Protect against reading over end
                     {
                         if(0 == strncmp(&text[i], stringNumbers[j], currentLength))
