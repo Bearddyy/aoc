@@ -18,9 +18,7 @@ static const size_t stringNumbersLength = 10;
 // accepts a line of text, returns the first and last digits combined
 int process_line(size_t length, char * text)
 {
-    int leftInd = length;
     int left = 0;
-    int rightInd = 0;
     int right = 0;
     bool leftFound = false;
 
@@ -30,36 +28,35 @@ int process_line(size_t length, char * text)
         {
             if (!leftFound) // We have not found left yet
             {
-                //We have found left, so we can set right too
+                //We have found left
                 left = text[i] - '0';
-                right = text[i] - '0';
                 leftFound = true;
             }
-            else // We have found left, so must be right
-            {
-                rightInd = i;
-                right = text[i] - '0';
-            }
+            // always update right
+            right = text[i] - '0';
         }
         else //It cant be a number, so check if it is a string number
         {
-            // Starting at j = 1 as challenge didnt state zero
-            for (size_t j = 1; j < stringNumbersLength; j++)
+            // check if there is at least the minimum length left
+            // This avoids checking the last few characters for a number
+            int remaining = length - i;
+            if(remaining >= strlen(stringNumbers[1]))
             {
-                size_t currentLength = strlen(stringNumbers[j]) - 1; // ignore null as that doesnt need to match
-                if(currentLength <= (length - i)) // Protect against reading over end
+                // Starting at j = 1 as challenge didnt state zero
+                for (size_t j = 1; j < stringNumbersLength; j++)
                 {
-                    if(0 == strncmp(&text[i],stringNumbers[j],currentLength))
+                    size_t currentLength = strlen(stringNumbers[j]) - 1; // ignore null as that doesnt need to match
+                    if(currentLength <= remaining) // Protect against reading over end
                     {
-                        if (!leftFound) // We have not found left yet
+                        if(0 == strncmp(&text[i], stringNumbers[j], currentLength))
                         {
-                            //We have found left, so we can set right too
-                            left = j;
-                            right = j;
-                            leftFound = true;
-                        }
-                        else // We have found left, so must be right
-                        {
+                            if (!leftFound) // We have not found left yet
+                            {
+                                //We have found left, so we can set right too
+                                left = j;
+                                leftFound = true;
+                            }
+                            // always update right
                             right = j;
                         }
                     }
