@@ -9,11 +9,8 @@
 #define colourStartDefault 3
 
 // accepts a line of text and the totals of red green blue
-int process_line(size_t length, char * text)
+int process_line(size_t length, char * text, int red, int green, int blue)
 {
-    int  min_red = 0;
-    int  min_green = 0;
-    int  min_blue = 0;
     char * gameString = strtok(text, ":");
     int gameNumber = 0;
     sscanf(&gameString[5], "%d", &gameNumber);
@@ -56,23 +53,23 @@ int process_line(size_t length, char * text)
             switch (draw[colourStart])
             {
             case 'r':
-                if(number > min_red)
+                if(number > red)
                 {
-                    min_red = number;
+                    return 0;
                 }
                 break;
             case 'g':
-                if(number > min_green)
+                if(number > green)
                 {
-                    min_green = number;
+                    return 0;
                 }
                 break;
             case 'b':
-                if(number > min_blue)
+                if(number > blue)
                 {
-                    min_blue = number;
+                    return 0;
                 }
-                break;        
+                break;            
             default:
                 printf("Got unknown letter %c\r\n",draw[colourStart] );
                 exit(0);
@@ -88,8 +85,8 @@ int process_line(size_t length, char * text)
         i++;
     }
 
-    
-    return min_red * min_blue * min_green;
+    //If we made it this far, the game was no invalid
+    return gameNumber;
 }
 
 int processFile(char * path, int red, int green, int blue)
@@ -112,7 +109,7 @@ int processFile(char * path, int red, int green, int blue)
     {
         // handle each line
         size_t length = strlen(line);
-        int temp = process_line(length, line);
+        int temp = process_line(length, line, red, green, blue);
         result += temp;
         //printf("result:%d\r\n", temp);
     }
