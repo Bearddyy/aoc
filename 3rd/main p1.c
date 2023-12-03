@@ -24,60 +24,41 @@ int processLines()
     {
         int offset = 0;
         bool symbolFound = false;
-        if(lines[1][i] == '*')
+        while(isdigit(lines[1][i+offset]))
         {
-            int digitsFound = 0;
-            int ratio = 0;
-            printf("Found *: %c \r\n",lines[1][i]);
+            printf("Found number: %c \r\n",lines[1][i + offset]);
             
             //Look around
-            for (int x = -1; (x <= 1); x++)
+            for (int x = -1; (x <= 1) && (!symbolFound); x++)
             {
-                for (int y = -1; (y <= 1); y++)
+                for (int y = -1; (y <= 1) && (!symbolFound); y++)
                 {
-                    printf("Checking %c\r\n",lines[1+x][i + y]);
-                    if(isdigit(lines[1+x][i + y]))
+                    printf("Checking %c\r\n",lines[1+x][i + y + offset]);
+                    if(lines[1+x][i + y + offset] != '.')
                     {
-                        printf("Found digit: %c\r\n",lines[1+x][i + y]);
-                        digitsFound++;
-                        if(digitsFound <= 2)
+                        if(lines[1+x][i + y + offset] != '\r')
                         {
-                            printf("Found a digit: %c\r\n",lines[1+x][i + y]);
-                            //Walk back to the start of the number
-                            int offset = 0;
-                            while(isdigit(lines[1+x][i + y + offset]))
+                            if(lines[1+x][i + y + offset] != '\n')
                             {
-                                offset--;
-                            }
-                            offset++;
-                            //Get the number
-                            int value;
-                            sscanf(&lines[1+x][i + y + offset], "%d", &value);
-                            if(ratio == 0)
-                            {
-                                ratio = value;
-                            }
-                            else
-                            {
-                                printf("Multiplying %d by %d\r\n", ratio, value);
-                                ratio *= value;
-                            }
-                            //skip to the end of the number
-                            while(isdigit(lines[1+x][i + y + 1]))
-                            {
-                                y++;
+                                if(!isdigit(lines[1 + x][i + y + offset]))
+                                {
+                                    //valid number
+                                    int value;
+                                    sscanf(&lines[1][i], "%d", &value);  
+                                    result += value;
+                                    symbolFound = true;
+                                    printf("Got Value: %d \r\n", value);
+                                }
                             }
                         }
-                        
-                        
                     }
                 }
             }
-            if(digitsFound == 2)
-            {
-                result += ratio;
-            }
+            offset++;
         }
+        // skip to the next non-digit
+        i += offset;       
+
     }
     return result;
 }
@@ -111,7 +92,6 @@ int processFile(char * path)
     while (fgets(&lines[2][1], maxLineLength, filePointer))
     {
         result += processLines();
-        printf("Result: %d\r\n", result);
 
         //copy all the arrays to the previous lines
         strcpy(lines[0], lines[1]);
@@ -139,7 +119,7 @@ void test_1(void)
     int result = processFile("initialInput.txt");
 
     // Expected result is 8
-    if(result == 467835)
+    if(result == 4361)
     {
         printf("Test 1 passed\r\n");
     }
