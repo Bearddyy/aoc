@@ -25,7 +25,7 @@ int process_line(size_t length, char * text)
     int winningNumbers_i[512] = {0};
     size_t totalWinningNumbers = 0;
     
-    //printf("Processing Winning Numbers \r\n");
+    printf("Processing Winning Numbers \r\n");
     while (winningNumber != NULL)
     {
         sscanf(winningNumber, "%d", &winningNumbers_i[totalWinningNumbers]);
@@ -34,7 +34,7 @@ int process_line(size_t length, char * text)
     }    
 
     char * guessedNumber_s = strtok_r(numbersGuessed, " ", &numbersGuessed);
-    int numverOfWinningNumbers = 0;
+    int winnings = 0;
     int guessedNumber_i = 0;
     // Parse the guessed numbers
     while (guessedNumber_s != NULL)
@@ -45,12 +45,19 @@ int process_line(size_t length, char * text)
         {
             if(guessedNumber_i == winningNumbers_i[i])
             {
-                numverOfWinningNumbers++;
+                if(winnings == 0)
+                {
+                    winnings = 1;
+                }
+                else
+                {
+                    winnings = winnings*2;
+                }
             }
         }
         guessedNumber_s = strtok_r(numbersGuessed, " ", &numbersGuessed);
     }
-    return numverOfWinningNumbers;
+    return winnings;
 }
 
 int processFile(char * path)
@@ -68,49 +75,24 @@ int processFile(char * path)
     //Overall result
     int result = 0;
 
-    int numberOfCardsEarned[512] = {0};
-    for (size_t i = 0; i < 512; i++)
-    {
-        numberOfCardsEarned[i] = 1;
-    }
-    
-    size_t currentCard = 1;
-    int totalCards = 0;
     // get each line
     while (fgets(line, maxLineLength, filePointer))
     {
         // handle each line
         size_t length = strlen(line);
-        if(numberOfCardsEarned[currentCard] > 0)
-        {
-            int numberOfWiningCards = process_line(length, line);
-            
-            for (size_t i = currentCard + 1; i <= (numberOfWiningCards + currentCard); i++)
-            {
-                numberOfCardsEarned[i] += (1 * numberOfCardsEarned[currentCard]);
-            }
-            totalCards += numberOfCardsEarned[currentCard];
-            
-            //printf("Line [%d] won:%d cards, had:%d so now total:%d\r\n", currentCard, numberOfWiningCards, numberOfCardsEarned[currentCard], totalCards);
-            currentCard++;
-        }
-        else
-        {
-            break;
-        }
-        
+        int temp = process_line(length, line);
+        result += temp;
+        printf("result:%d\r\n", temp);
     }
-
-    // Count the total
     fclose(filePointer);
-    return totalCards;
+    return result;
 }
 
 void test_1()
 {
-    int result = processFile("testp2.txt");
+    int result = processFile("testCase.txt");
     
-    if (result != 30)
+    if (result != 13)
     {
         printf("Test 1 failed, result: %d\r\n", result);
     }
