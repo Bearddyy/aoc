@@ -37,6 +37,12 @@ int processFile(char * path)
         seedIndex++;
     }
     
+    printf("Starting Seeds: [");
+    for (size_t i = 0; i < seedIndex; i++)
+    {
+        printf("%lu,", seeds[i]);
+    }
+    printf("]\r\n");
 
     bool done = false;
     // get each line after the seeds
@@ -44,12 +50,6 @@ int processFile(char * path)
     {
         if(isalpha(line[0]) != 0)
         {
-            printf("Found Map: Seeds: [");
-            for (size_t i = 0; i < seedIndex; i++)
-            {
-                printf("%lu,", seeds[i]);
-            }
-            printf("]\r\n");
 
             bool endOfMap = false;
             
@@ -62,7 +62,7 @@ int processFile(char * path)
             {
                 if(isdigit(line[0]) == 0)
                 {
-                    printf("got line: %c \r\n", line[0]);
+                    //printf("got line: %c \r\n", line[0]);
                     break;
                 }
 
@@ -72,19 +72,16 @@ int processFile(char * path)
 
                 mapEntries++;
             }
-            for (size_t i = 0; i < mapEntries; i++)
-            {
-                printf("[%d] : %lu,%lu,%lu \r\n", i,destination[i], source[i], length[i]);
-            }
             for (size_t j = 0; j < seedIndex; j++)
             {
                 for (size_t i = 0; i < mapEntries; i++)
                 {
-                    if(seeds[j] > source[i])
+                    if(seeds[j] >= source[i])
                     {
                         if(seeds[j] < (source[i] + length[i]))
                         {
                             seeds[j] = (seeds[j] - source[i]) + destination[i];
+                            break;
                         }
                     }
                 }
@@ -92,15 +89,19 @@ int processFile(char * path)
         }
     }
 
-    int minSeed = seeds[0];
+    unsigned long minSeed = seeds[0];
 
+    printf("Final Seeds: [");
     for (size_t i = 0; i < seedIndex; i++)
     {
+        
+        printf("%lu,", seeds[i]);
         if (seeds[i] < minSeed)
         {
             minSeed = seeds[i];
         }
     }
+    printf("]\r\n");
 
     printf("Found min seed: %lu\r\n", minSeed);
     
@@ -138,7 +139,7 @@ void test_2()
 
 int main(void)
 {
-    //test_1();
+    test_1();
     test_2();
     return 0;
 }
